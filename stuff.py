@@ -11,7 +11,7 @@ class Type(Enum):
   BRANCH = 1
 
 ## TODO:
-## - implement ijson for even more memory efficient access
+## - implement ijson for even more memory efficient access (probably too slow...)
 ## - feature: lookup tables for reappearing key/map names, which associate IDs to them which are automatically looked up when needed
 class Dict:
   _root_store = 'root'
@@ -212,6 +212,10 @@ def load(obj):
   if isinstance(obj, str):
     if os.path.isdir(obj):
       data = Dict(Name = obj)
+    elif os.path.isfile(obj):
+      ## Assume that this is a json file and load it
+      with open(obj, 'r') as inFile:
+        data = json.load(inFile)
     else:
       print ('Input not found...')
       raise SystemExit
@@ -221,7 +225,7 @@ def load(obj):
     
   return data
 
-def dump(obj, name, store_depth = 1, append = False):
+def dump(obj, name = None, store_depth = 1, append = False):
   ## name is either a file-like object, then just dump a normal json file
   ## Else, if it's the name of a file on disk, throw an exception
   ## If not, then build a Dict with name as the name of the root folder
@@ -230,6 +234,9 @@ def dump(obj, name, store_depth = 1, append = False):
   if not isinstance(store_depth, int):
     print ('Store depth is not integer...')
     raise TypeError
+  if isinstance(obj, Dict):
+    ## This is a jsonx.Dict, so we can just call it's write function
+    obj.write()
   if isinstance(name, str):
     Dict.dump(obj, name, store_depth, append)
   else:
