@@ -1,2 +1,2 @@
 
-from stuff import load, dump, Dict
+from .stuff import load, dump, merge, Dict

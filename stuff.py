@@ -163,54 +163,6 @@ class Dict:
     with open(name, 'w') as outFile:
       json.dump(meta, outFile)
 
-  ## TODO: switch that decides what to do when we have the same entry in source and merger (which one to keep, currently it's source)
-  # def merge(self, obj):
-    # if not isinstance(obj, dict) and not isinstance(obj, Dict):
-    #   print ('Input object is not of type dict or jsonx.Dict...')
-    #   raise TypeError
-    # for key in obj.keys():
-    #   if key not in self._payload:
-    #     self._payload[key] = obj[key]
-    #     if isinstance(self._payload, Dict): self._update_keys()
-    #     continue
-    #   if isinstance(obj[key], dict) or isinstance(obj[key], Dict):
-    #     if not isinstance(self._payload[key], dict) and not isinstance(self._payload[key], Dict):
-    #       print ('Merger is a dict like, but source is not...')
-    #       raise TypeError
-    #     if isinstance(self._payload[key], Dict):
-    #       self._payload[key].merge(obj[key])
-    #     else:
-    #       Dict.merge_dicts(self._payload[key], obj[key])
-    #   elif type(self._payload[key]) is not type(obj[key]):
-    #     print ('Source and merger key values are not of the same type...')
-    #     raise TypeError
-    #   elif isinstance(obj[key], list):
-    #     for entry in obj[key]:
-    #       self._payload[key].append(entry)
-
-  # @staticmethod
-  # def merge_dicts(source, merger):
-  #   if not isinstance(obj, dict) and not isinstance(obj, Dict):
-  #   for key in obj.keys():
-  #     if key not in self._payload:
-  #       self._payload[key] = obj[key]
-  #       if isinstance(self._payload, Dict): self._update_keys()
-  #       continue
-  #     if isinstance(obj[key], dict) or isinstance(obj[key], Dict):
-  #       if not isinstance(self._payload[key], dict) and not isinstance(self._payload[key], Dict):
-  #         print ('Merger is a dict like, but source is not...')
-  #         raise TypeError
-  #       if isinstance(self._payload[key], Dict):
-  #         self._payload[key].merge(obj[key])
-  #       else:
-  #         Dict.merge_dicts(self._payload[key], obj[key])
-  #     elif type(self._payload[key]) is not type(obj[key]):
-  #       print ('Source and merger key values are not of the same type...')
-  #       raise TypeError
-  #     elif isinstance(obj[key], list):
-  #       for entry in obj[key]:
-  #         self._payload[key].append(entry)
-
   @staticmethod
   def dump(obj, name, store_depth, append):
     if store_depth < 0:
@@ -289,3 +241,25 @@ def dump(obj, name = None, store_depth = 1, append = False):
     Dict.dump(obj, name, store_depth, append)
   else:
     json.dump(obj, name)
+
+## TODO: switch that decides what to do when we have the same entry in source and merger (which one to keep, currently it's source)
+## TODO: just ignore merger entry instead of throwing exceptions?
+def merge(base, merger):
+  if isinstance(merger, dict) or isinstance(merger, Dict):
+    if not ( isinstance(base, dict) or isinstance(base, Dict) ):
+      print ('Merger is of type dict/jsonx.Dict, but base if not...')
+      raise TypeError
+    for key in merger.keys():
+      if key not in base:
+        base[key] = merger[key]
+        continue
+      merge(base[key], merger[key])
+  elif isinstance(merger, list):
+    if not isinstance(base, list):
+      print ('Merger is of type list, but base if not...')
+      raise TypeError
+    for entry in merger:
+      base.append(entry)
+  elif isinstance(merger, int) or isinstance(merger, float) or isinstance(merger, str):
+    if isinstance(base, list):
+      base.append(merger)
