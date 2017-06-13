@@ -217,7 +217,7 @@ def load(obj):
       with open(obj, 'r') as inFile:
         data = json.load(inFile)
     else:
-      print ('Input not found...')
+      print ('Input not found: {}'.format(obj))
       raise SystemExit
   else:
     ## If input is not a string, assume that it's a file-type object, just load as json file in this case
